@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Documentação dos Fluxos de Comunicação - Arquitetura AWS Segura</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 14mm 12mm 14mm 12mm;
+    @bottom-right {
+      content: counter(page);
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #232f3e;
+    line-height: 1.45;
+    font-size: 10pt;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+  }
+
+  .header {
+    border-bottom: 3px solid #ff9900;
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .header-titles {
+    flex: 1;
+  }
+
+  h1 {
+    font-size: 18pt;
+    font-weight: 700;
+    color: #1a2737;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.3px;
+  }
+
+  .header-meta {
+    font-size: 9pt;
+    color: #556b82;
+    margin-top: 4px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .header-meta span strong {
+    color: #232f3e;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 8pt;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-aws {
+    background-color: #232f3e;
+    color: #ff9900;
+  }
+
+  .badge-secure {
+    background-color: #e6f6f7;
+    color: #0073bb;
+    border: 1px solid #bce1e8;
+  }
+
+  h2 {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #147eba;
+    border-left: 4px solid #ff9900;
+    padding-left: 8px;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #232f3e;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin: 0 0 8px 0;
+    text-align: justify;
+  }
+
+  ul, ol {
+    margin: 4px 0 10px 18px;
+    padding: 0;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  .callout {
+    background-color: #f8f9fa;
+    border-left: 4px solid #00a4a6;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 10px 0;
+    font-size: 9pt;
+  }
+
+  .callout strong {
+    color: #0073bb;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 16px 0;
+    font-size: 8.5pt;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  th {
+    background-color: #232f3e;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: left;
+    padding: 6px 8px;
+    border: 1px solid #37475a;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  td {
+    padding: 6px 8px;
+    border: 1px solid #d5dbdb;
+    vertical-align: top;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f7f9f9;
+  }
+
+  .port-badge {
+    display: inline-block;
+    background-color: #eaeded;
+    color: #16191f;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 8pt;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid #d5dbdb;
+    white-space: nowrap;
+  }
+
+  .tag-sg {
+    font-family: Consolas, monospace;
+    font-size: 7.5pt;
+    background-color: #fff2cc;
+    color: #8f6b00;
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid #d6b656;
+    display: inline-block;
+  }
+
+  .tag-deny {
+    background-color: #fde8e8;
+    color: #9b1c1c;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid #f8b4b4;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+  }
+
+  .tag-allow {
+    background-color: #def7ec;
+    color: #03543f;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid #84e1bc;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+  }
+
+  .diagram-box {
+    background-color: #f4f6f8;
+    border: 1px solid #d5dbdb;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 8pt;
+    line-height: 1.35;
+    color: #16191f;
+    margin: 10px 0;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .flow-step-box {
+    background-color: #fdfdfd;
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid #ff9900;
+    padding: 7px 10px;
+    margin-bottom: 8px;
+    border-radius: 0 4px 4px 0;
+    font-size: 9pt;
+  }
+
+  .flow-step-box strong {
+    color: #232f3e;
+  }
+
+  .footer-note {
+    font-size: 7.5pt;
+    color: #768b9e;
+    text-align: center;
+    border-top: 1px solid #eaeded;
+    padding-top: 8px;
+    margin-top: 20px;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-titles">
+    <div style="margin-bottom: 4px;">
+      <span class="badge badge-aws">AWS Cloud</span>
+      <span class="badge badge-secure">Defesa em Profundidade</span>
+      <span class="badge" style="background:#f3eeff; color:#6b21a8; border:1px solid #d8b4fe;">Zero Trust</span>
+    </div>
+    <h1>Documentação dos Fluxos de Comunicação</h1>
+    <div class="header-meta">
+      <span><strong>Projeto:</strong> Arquitetura Cloud Segura</span>
+      <span><strong>Região:</strong> sa-east-1 (São Paulo)</span>
+      <span><strong>VPC:</strong> 10.0.0.0/16</span>
+      <span><strong>Artefato:</strong> fluxos.pdf</span>
+    </div>
+  </div>
+</div>
+
+<h2>1. Visão Geral e Topologia de Rede</h2>
+<p>
+  A arquitetura foi projetada para atender integralmente aos requisitos de isolamento, resiliência e confidencialidade. Nenhum componente interno possui endereço IP público ou rota direta de entrada pela Internet. Toda a infraestrutura está contida em uma <strong>Virtual Private Cloud (VPC)</strong> com CIDR <code>10.0.0.0/16</code>, dividida em três camadas estruturadas e distribuída em duas Zonas de Disponibilidade (<strong>sa-east-1a</strong> e <strong>sa-east-1b</strong>):
+</p>
+<ul>
+  <li><strong>Sub-redes Públicas (10.0.1.0/24 e 10.0.2.0/24):</strong> Hospedam exclusivamente o <em>Application Load Balancer (ALB)</em> protegido pelo <em>AWS WAF</em> e conectado ao <em>Internet Gateway (IGW)</em>.</li>
+  <li><strong>Sub-redes Privadas de Aplicação (10.0.11.0/24 e 10.0.12.0/24):</strong> Hospedam as instâncias EC2 da API Backend e o endpoint do <em>AWS Client VPN</em>. Sem IP público e sem rota para a Internet.</li>
+  <li><strong>Sub-redes Privadas de Dados (10.0.21.0/24 e 10.0.22.0/24):</strong> Hospedam o cluster <em>Amazon RDS MySQL Multi-AZ</em> (Primário na AZ-a e Standby na AZ-b). Isolamento completo.</li>
+  <li><strong>Conectividade Privada com Serviços AWS:</strong> Todos os acessos ao <em>Amazon S3</em>, <em>AWS Secrets Manager</em>, <em>AWS KMS</em> e <em>CloudWatch</em> trafegam por <strong>VPC Endpoints</strong> (Gateway e PrivateLink), dispensando NAT Gateways para a internet.</li>
+</ul>
+
+<div class="diagram-box">
++-------------------------------------------------------------------------------------------------------+
+|                                    AWS Cloud · Região sa-east-1                                      |
+|                                                                                                       |
+|  [ Clientes Externos ] --(HTTPS 443)--> [ Internet Gateway ]                                          |
+|                                                  |                                                    |
+|                                        [ AWS WAF Web ACL ]                                            |
+|                                                  |                                                    |
+|  Sub-redes Públicas                              v                                                    |
+|  (10.0.1.0/24 & 10.0.2.0/24)        [ Application Load Balancer ] (app-prod-alb-sg)                   |
+|                                                  |                                                    |
+|  ------------------------------------------------| (TCP 3000 interno) ------------------------------- |
+|  Sub-redes Privadas APP                          v                                                    |
+|  (10.0.11.0/24 & 10.0.12.0/24)       [ API Backend EC2 Clusters ] (app-prod-api-sg)                   |
+|                                       /          |           \                                        |
+|  ------------------------------------/-----------|------------\-------------------------------------- |
+|  Sub-redes Privadas DADOS           /            |             \                                      |
+|  (10.0.21.0/24 & 10.0.22.0/24)     /             |              \                                     |
+|                                   v              v               v                                    |
+|                      [ RDS MySQL Multi-AZ ] [ VPC Gateway EP ] [ Interface Endpoints - PrivateLink ] |
+|                         (app-prod-db-sg)    (S3 Uploads Bucket)  (Secrets Manager, KMS, CloudWatch)   |
+|                                   ^                                                                   |
+|                                   | (Admin Restrito)                                                 |
+|  [ Equipe Admin ] -(VPN+MFA)-> [ AWS Client VPN ] ----------------+ (SSM / SSH 22 para EC2)          |
++-------------------------------------------------------------------------------------------------------+
+</div>
+
+<h2>2. Matriz de Conexões Permitidas (Whitelisting Estrito)</h2>
+<p>
+  Cada fluxo foi planejado de acordo com a política de menor privilégio. A tabela a seguir especifica todas as comunicações autorizadas:
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 7%;">ID</th>
+      <th style="width: 17%;">Origem</th>
+      <th style="width: 18%;">Destino</th>
+      <th style="width: 14%;">Protocolo / Porta</th>
+      <th style="width: 16%;">Mecanismo de Controle</th>
+      <th style="width: 28%;">Finalidade e Justificativa de Segurança</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FL-01</strong></td>
+      <td>Internet pública<br><code>0.0.0.0/0</code></td>
+      <td>Application Load Balancer (ALB)</td>
+      <td><span class="port-badge">TCP 443 (HTTPS)</span></td>
+      <td><span class="tag-sg">app-prod-alb-sg</span><br>+ AWS WAF Web ACL</td>
+      <td><strong>Ponto de entrada público único.</strong> Conexões TLS com certificado ACM. O AWS WAF bloqueia SQLi, XSS, rate-limit e bots antes do ALB.</td>
+    </tr>
+    <tr>
+      <td><strong>FL-02</strong></td>
+      <td>Internet pública<br><code>0.0.0.0/0</code></td>
+      <td>Application Load Balancer (ALB)</td>
+      <td><span class="port-badge">TCP 80 (HTTP)</span></td>
+      <td><span class="tag-sg">app-prod-alb-sg</span><br>+ Listener ALB</td>
+      <td><strong>Redirecionamento automático.</strong> Porta 80 atende unicamente para emitir redirecionamento HTTP 301 para HTTPS (443). Dados em trânsito sempre criptografados.</td>
+    </tr>
+    <tr>
+      <td><strong>FL-03</strong></td>
+      <td>ALB Público<br><span class="tag-sg">app-prod-alb-sg</span></td>
+      <td>Instâncias API EC2<br><span class="tag-sg">app-prod-api-sg</span></td>
+      <td><span class="port-badge">TCP 3000</span></td>
+      <td><span class="tag-sg">app-prod-api-sg</span><br>(Referência por ID de SG)</td>
+      <td><strong>Encaminhamento de requisições web.</strong> O ALB distribui carga para as instâncias privadas. O SG da API rejeita pacotes de qualquer outra origem que não seja o ALB.</td>
+    </tr>
+    <tr>
+      <td><strong>FL-04</strong></td>
+      <td>Instâncias API EC2<br><span class="tag-sg">app-prod-api-sg</span></td>
+      <td>Amazon RDS MySQL<br><span class="tag-sg">app-prod-db-sg</span></td>
+      <td><span class="port-badge">TCP 3306</span></td>
+      <td><span class="tag-sg">app-prod-db-sg</span><br>(Referência por ID de SG)</td>
+      <td><strong>Transações de banco de dados.</strong> As instâncias EC2 da API consultam e persistem registros no RDS Primário. Tráfego contido estritamente na VPC privada.</td>
+    </tr>
+    <tr>
+      <td><strong>FL-05</strong></td>
+      <td>RDS Primário (AZ-a)<br><span class="tag-sg">app-prod-db-sg</span></td>
+      <td>RDS Standby (AZ-b)<br><span class="tag-sg">app-prod-db-sg</span></td>
+      <td><span class="port-badge">TCP 3306</span></td>
+      <td>Segurança interna gerenciada AWS RDS</td>
+      <td><strong>Replicação síncrona Multi-AZ.</strong> Garante alta disponibilidade, redundância contra falha de data center e RPO zero entre AZ-a e AZ-b.</td>
+    </tr>
+    <tr>
+      <td><strong>FL-06</strong></td>
+      <td>Instâncias API EC2<br><span class="tag-sg">app-prod-api-sg</span></td>
+      <td>Gateway Endpoint S3<br><code>pl-xxxxxxx (AWS S3)</code></td>
+      <td><span class="port-badge">TCP 443 (HTTPS)</span></td>
+      <td>Tabela de rotas privadas + Bucket Policy S3</td>
+      <td><strong>Armazenamento de arquivos de usuários.</strong> Upload e leitura em bucket S3 privado sem tráfego por internet. Acesso condicionado ao ID do Endpoint e IAM Role.</td>
+    </tr>
+    <tr>
+      <td><strong>FL-07</strong></td>
+      <td>Instâncias API EC2<br><span class="tag-sg">app-prod-api-sg</span></td>
+      <td>Interface Endpoints<br><span class="tag-sg">app-prod-vpce-sg</span></td>
+      <td><span class="port-badge">TCP 443 (HTTPS)</span></td>
+      <td><span class="tag-sg">app-prod-vpce-sg</span><br>+ AWS PrivateLink</td>
+      <td><strong>Segredos e Criptografia.</strong> Recuperação das credenciais do RDS no <em>Secrets Manager</em> e operações de cifragem/decriptação no <em>AWS KMS</em> via link privado.</td>
+    </tr>
+    <tr>
+      <td><strong>FL-08</strong></td>
+      <td>Instâncias EC2 / ALB / RDS / VPC</td>
+      <td>CloudWatch Logs e Métricas</td>
+      <td><span class="port-badge">TCP 443 (HTTPS)</span></td>
+      <td>Interface VPC Endpoint (vpce-logs)</td>
+      <td><strong>Observabilidade e auditoria.</strong> Coleta de métricas operacionais, logs da aplicação Node/Python, logs de acesso do ALB e VPC Flow Logs para auditoria contínua.</td>
+    </tr>
+    <tr>
+      <td><strong>FL-09</strong></td>
+      <td>Estações Admin autorizadas</td>
+      <td>AWS Client VPN Endpoint</td>
+      <td><span class="port-badge">UDP/TCP 443</span></td>
+      <td><span class="tag-sg">app-prod-vpn-sg</span><br>+ MFA / Certificados</td>
+      <td><strong>Canal administrativo seguro.</strong> Estabelece túnel VPN criptografado. Exige autenticação multifator (MFA) e validação de credenciais de administradores.</td>
+    </tr>
+    <tr>
+      <td><strong>FL-10</strong></td>
+      <td>Client VPN<br><span class="tag-sg">app-prod-vpn-sg</span></td>
+      <td>Instâncias API EC2<br><span class="tag-sg">app-prod-api-sg</span></td>
+      <td><span class="port-badge">HTTPS 443 / TCP 22</span></td>
+      <td><span class="tag-sg">app-prod-api-sg</span><br>+ IAM SSM Policies</td>
+      <td><strong>Gerenciamento de servidores.</strong> Prioritário via <em>AWS Systems Manager Session Manager</em> (sem portas abertas). Porta 22 (SSH) aceita conexões somente do CIDR da VPN.</td>
+    </tr>
+    <tr>
+      <td><strong>FL-11</strong></td>
+      <td>Client VPN<br><span class="tag-sg">app-prod-vpn-sg</span></td>
+      <td>Amazon RDS MySQL<br><span class="tag-sg">app-prod-db-sg</span></td>
+      <td><span class="port-badge">TCP 3306</span></td>
+      <td><span class="tag-sg">app-prod-db-sg</span><br>(Regra explícita restrita)</td>
+      <td><strong>Manutenção extraordinária de banco.</strong> Acesso administrativo direto pontual para DBAs/DevOps, com autorização de rede e auditoria de sessão.</td>
+    </tr>
+    <tr>
+      <td><strong>FL-12</strong></td>
+      <td>Todas as Interfaces (ENIs da VPC)</td>
+      <td>CloudWatch Logs / S3</td>
+      <td><span class="port-badge">HTTPS 443</span></td>
+      <td>VPC Flow Logs Service Role</td>
+      <td><strong>Registro de tráfego de rede.</strong> Captura metadados de pacotes aceitos e rejeitados para detecção de anomalias, auditoria de segurança e perícia forense.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<h2>3. Matriz de Conexões Bloqueadas (Postura Default-Deny)</h2>
+<p>
+  Seguindo a política de menor privilégio e isolamento de camadas, toda comunicação não explicitamente permitida é barrada. A tabela abaixo detalha os principais bloqueios de arquitetura e sua relevância de segurança:
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 22%;">Vetor de Comunicação</th>
+      <th style="width: 14%;">Origem</th>
+      <th style="width: 15%;">Destino</th>
+      <th style="width: 12%;">Porta / Protocolo</th>
+      <th style="width: 15%;">Mecanismo</th>
+      <th style="width: 22%;">Risco Mitigado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="tag-deny">Bloqueado</span><br><strong>Acesso direto à API</strong></td>
+      <td>Internet pública<br><code>0.0.0.0/0</code></td>
+      <td>Instâncias EC2 da API Backend</td>
+      <td>Qualquer porta (3000, 80, 443)</td>
+      <td>Sub-rede Privada (sem IGW) + SG restrito</td>
+      <td>Ataques de negação de serviço direto, bypass do firewall de aplicação (WAF) e varreduras de vulnerabilidade.</td>
+    </tr>
+    <tr>
+      <td><span class="tag-deny">Bloqueado</span><br><strong>Acesso público ao Banco</strong></td>
+      <td>Internet pública<br><code>0.0.0.0/0</code></td>
+      <td>Amazon RDS MySQL</td>
+      <td>TCP 3306</td>
+      <td>Sub-rede de Dados isolada + flag <code>Publicly Accessible=False</code></td>
+      <td>Vazamento massivo de dados, tentativas de brute-force e ataques de ransomware contra a base relacional.</td>
+    </tr>
+    <tr>
+      <td><span class="tag-deny">Bloqueado</span><br><strong>Tráfego direto do ALB ao Banco</strong></td>
+      <td>ALB Público<br><span class="tag-sg">app-prod-alb-sg</span></td>
+      <td>Amazon RDS MySQL</td>
+      <td>Qualquer porta</td>
+      <td><span class="tag-sg">app-prod-db-sg</span> (sem regra de entrada)</td>
+      <td>Vetores de Server-Side Request Forgery (SSRF) e contaminação cruzada caso o balanceador fosse comprometido.</td>
+    </tr>
+    <tr>
+      <td><span class="tag-deny">Bloqueado</span><br><strong>SSH aberto para o mundo</strong></td>
+      <td>Internet pública<br><code>0.0.0.0/0</code></td>
+      <td>Instâncias EC2 API / Bastion</td>
+      <td>TCP 22 (SSH)</td>
+      <td><span class="tag-sg">app-prod-api-sg</span> (rejeição explícita de 0.0.0.0/0)</td>
+      <td>Ataques automatizados de força bruta SSH, comprometimento de chaves privadas e exploits de zero-day no OpenSSH.</td>
+    </tr>
+    <tr>
+      <td><span class="tag-deny">Bloqueado</span><br><strong>Acesso HTTP em texto plano</strong></td>
+      <td>Clientes Web</td>
+      <td>ALB / Backend API</td>
+      <td>TCP 80 (cargas úteis)</td>
+      <td>Listener ALB HTTP:80 com regra de Redirect 301</td>
+      <td>Interceptação de credenciais, espionagem de tráfego de rede e ataques de Man-in-the-Middle (MitM).</td>
+    </tr>
+    <tr>
+      <td><span class="tag-deny">Bloqueado</span><br><strong>Acesso público a arquivos no S3</strong></td>
+      <td>Internet pública<br><code>0.0.0.0/0</code></td>
+      <td>Bucket S3 de Uploads</td>
+      <td>HTTP / HTTPS</td>
+      <td>S3 Block Public Access (100% On) + Bucket Policy</td>
+      <td>Exposição acidental de arquivos de clientes, violação da LGPD/GDPR e indexação não autorizada por mecanismos de busca.</td>
+    </tr>
+    <tr>
+      <td><span class="tag-deny">Bloqueado</span><br><strong>Saída irrestrita para Internet</strong></td>
+      <td>Instâncias EC2 da API</td>
+      <td>Internet pública</td>
+      <td>Qualquer protocolo / porta</td>
+      <td>Ausência de NAT Gateway na VPC privada</td>
+      <td>Exfiltração de dados por malwares, comunicação com servidores de Comando e Controle (C2) e download de exploits.</td>
+    </tr>
+    <tr>
+      <td><span class="tag-deny">Bloqueado</span><br><strong>Tráfego lateral entre servidores</strong></td>
+      <td>Instância EC2 API A</td>
+      <td>Instância EC2 API B</td>
+      <td>Portas não declaradas</td>
+      <td><span class="tag-sg">app-prod-api-sg</span></td>
+      <td>Movimentação lateral de ameaças dentro do cluster em caso de comprometimento pontual de uma instância.</td>
+    </tr>
+    <tr>
+      <td><span class="tag-deny">Bloqueado</span><br><strong>Exploits Web conhecidos (L7)</strong></td>
+      <td>Atacantes da Internet</td>
+      <td>ALB / Aplicação</td>
+      <td>HTTP/HTTPS maliciosos</td>
+      <td>AWS WAF Managed Rulesets</td>
+      <td>Ataques catalogados na OWASP Top 10 (SQL Injection, Cross-Site Scripting, RCE e Path Traversal).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. Especificação Detalhada dos Security Groups</h2>
+
+<div class="flow-step-box">
+  <strong>1. app-prod-alb-sg (Camada de Borda / Entrada Pública)</strong><br>
+  • <strong>Ingress:</strong> TCP 443 de <code>0.0.0.0/0</code> (HTTPS público seguro); TCP 80 de <code>0.0.0.0/0</code> (apenas redirecionamento 301 para 443).<br>
+  • <strong>Egress:</strong> TCP 3000 com destino restrito ao identificador do grupo <code>app-prod-api-sg</code>.
+</div>
+
+<div class="flow-step-box">
+  <strong>2. app-prod-api-sg (Camada de Aplicação / Processamento)</strong><br>
+  • <strong>Ingress:</strong> TCP 3000 originado unicamente de <code>app-prod-alb-sg</code>; TCP 22 restrito ao CIDR administrativo de <code>app-prod-vpn-sg</code>.<br>
+  • <strong>Egress:</strong> TCP 3306 destinado a <code>app-prod-db-sg</code>; TCP 443 destinado a <code>app-prod-vpce-sg</code>; TCP 443 destinado à Prefix List do S3.
+</div>
+
+<div class="flow-step-box">
+  <strong>3. app-prod-db-sg (Camada de Dados / Persistência)</strong><br>
+  • <strong>Ingress:</strong> TCP 3306 originado unicamente de <code>app-prod-api-sg</code>; TCP 3306 condicional de <code>app-prod-vpn-sg</code> para tarefas de administração.<br>
+  • <strong>Egress:</strong> Sem regras amplas de saída. Apenas tráfego de resposta às consultas (natureza stateful) e replicação interna Multi-AZ.
+</div>
+
+<div class="flow-step-box">
+  <strong>4. app-prod-vpce-sg (Camada de Serviços Gerenciados AWS PrivateLink)</strong><br>
+  • <strong>Ingress:</strong> TCP 443 originado estritamente de <code>app-prod-api-sg</code> (Secrets Manager, KMS, CloudWatch Logs e SSM).<br>
+  • <strong>Egress:</strong> Resposta às chamadas de API internas das interfaces elásticas privadas (ENIs).
+</div>
+
+<div class="flow-step-box">
+  <strong>5. app-prod-vpn-sg (Camada de Acesso Administrativo e Manutenção)</strong><br>
+  • <strong>Ingress:</strong> UDP/TCP 443 a partir de endereços administrativos na internet mediante autenticação forte e MFA.<br>
+  • <strong>Egress:</strong> TCP 443 (SSM) e TCP 22 para <code>app-prod-api-sg</code>; TCP 3306 para <code>app-prod-db-sg</code> sob regra de autorização explícita do Client VPN.
+</div>
+
+<div class="page-break"></div>
+
+<h2>5. Detalhamento dos Fluxos Operacionais Fim a Fim</h2>
+
+<h3>Fluxo A: Requisição Web Segura do Usuário e Processamento</h3>
+<ol>
+  <li><strong>Iniciação da Sessão:</strong> O usuário envia uma requisição HTTPS para o domínio corporativo. O DNS resolve o alias para os IPs elásticos do ALB nas sub-redes públicas A e B.</li>
+  <li><strong>Filtragem no WAF:</strong> O <em>AWS WAF</em> intercepta a requisição e valida a assinatura contra regras gerenciadas da AWS (reputação de IP, mitigação de SQLi, XSS e flood rate-limiting). Se maliciosa, a conexão é descartada com código 403 Forbidden.</li>
+  <li><strong>Término TLS e Distribuição:</strong> O ALB desembala a conexão TLS com o certificado emitido pelo <em>AWS Certificate Manager (ACM)</em> e escolhe um nó íntegro de API com base no algoritmo de balanceamento.</li>
+  <li><strong>Comunicação Interna Segura:</strong> A requisição é encaminhada na porta TCP <code>3000</code> para a instância EC2 na AZ privada correspondente. O <code>app-prod-api-sg</code> autoriza o pacote por reconhecer o ID do SG do balanceador.</li>
+</ol>
+
+<h3>Fluxo B: Conexão Segura ao Banco de Dados Relacional</h3>
+<ol>
+  <li><strong>Autenticação sem Senhas no Código:</strong> A API invoca o <em>AWS Secrets Manager</em> através do <strong>Interface VPC Endpoint</strong> (TCP 443) utilizando credenciais temporárias obtidas via sua <strong>IAM Role</strong> de instância.</li>
+  <li><strong>Abertura de Conexão:</strong> A API obtém a string e credenciais e estabelece conexão TCP na porta <code>3306</code> com o endpoint do RDS MySQL.</li>
+  <li><strong>Isolamento Físico e Lógico:</strong> O pacote trafega estritamente dentro da VPC até a sub-rede privada de dados. O <code>app-prod-db-sg</code> permite a entrada do tráfego unicamente porque a origem é o <code>app-prod-api-sg</code>.</li>
+  <li><strong>Replicação Automática:</strong> Concomitantemente, qualquer transação de escrita é sincronizada de modo síncrono com a instância Standby na AZ-b, mantendo réplica idêntica sem expor portas adicionais.</li>
+</ol>
+
+<h3>Fluxo C: Upload e Armazenamento Privado de Arquivos (Amazon S3)</h3>
+<ol>
+  <li><strong>Recepção do Objeto:</strong> O usuário envia um arquivo através da API.</li>
+  <li><strong>Roteamento via Gateway Endpoint:</strong> A instância EC2 faz um <code>PutObject</code> na API S3 (<code>https://s3.sa-east-1.amazonaws.com</code>). A tabela de rotas da sub-rede privada intercepta o CIDR do S3 e desvia o tráfego para o <strong>Gateway VPC Endpoint</strong> (<code>vpce-s3</code>), mantendo o pacote dentro da infraestrutura interna da AWS sem tráfego de internet.</li>
+  <li><strong>Validação de Políticas de Segurança:</strong> O S3 valida que o <em>S3 Block Public Access</em> está 100% habilitado e a <em>Bucket Policy</em> exige que a chamada se origine do identificador específico do VPC Endpoint da empresa.</li>
+  <li><strong>Criptografia em Repouso:</strong> O objeto é gravado com cifragem no lado do servidor utilizando chave gerenciada pelo cliente no KMS (<strong>SSE-KMS</strong>), garantindo controle total sobre quem pode decriptar os dados.</li>
+</ol>
+
+<h3>Fluxo D: Manutenção Administrativa Segura e Auditoria</h3>
+<ol>
+  <li><strong>Túnel Criptografado com MFA:</strong> O operador administrativo conecta-se ao <strong>AWS Client VPN</strong> na porta 443, passando por verificação multifator obrigatória.</li>
+  <li><strong>Acesso sem Portas Abertas (AWS SSM):</strong> O administrador gerencia os servidores EC2 prioritariamente através do <strong>AWS Systems Manager Session Manager</strong>, que encapsula comandos via canal TLS protegido por IAM, dispensando chaves SSH e eliminando a necessidade de Bastion Hosts.</li>
+  <li><strong>Trilhas e Rastreabilidade Total:</strong> Todas as ações administrativas são registradas no <strong>AWS CloudTrail</strong> (quem realizou, quando, de qual IP e qual parâmetro foi enviado). As sessões de terminal podem ser gravadas em buckets S3 com retenção imutável.</li>
+  <li><strong>Monitoramento de Rede:</strong> O <strong>VPC Flow Logs</strong> captura dados de todas as conexões permitidas e rejeitadas, enviando os eventos para o <strong>Amazon CloudWatch Logs</strong> com alertas configurados para picos de conexões negadas.</li>
+</ol>
+
+<h2>6. Conformidade com os Requisitos do Projeto</h2>
+<p>
+  A solução atende rigorosamente a cada uma das diretrizes formuladas na proposta acadêmica:
+</p>
+<ul>
+  <li><strong>Requisito 1 (HTTPS obrigatório):</strong> Tráfego externo TLS/HTTPS 443 obrigatório no ALB, com redirecionamento de HTTP 80 para HTTPS.</li>
+  <li><strong>Requisito 2 (Proteção e distribuição de tráfego):</strong> AWS WAF associado ao ALB para proteção L7 e distribuição de carga com alta disponibilidade.</li>
+  <li><strong>Requisito 3 (Processamento seguro na API):</strong> Instâncias EC2 em sub-redes privadas sem IP público, comunicando-se internamente com recursos restritos.</li>
+  <li><strong>Requisito 4 (Banco de dados inacessível publicamente):</strong> RDS MySQL em sub-redes privadas dedicadas, sem rota pública e com acesso exclusivo pela API (3306).</li>
+  <li><strong>Requisito 5 (Armazenamento controlado de arquivos):</strong> Bucket S3 com Block Public Access ativo, acessado privadamente via Gateway Endpoint e protegido com SSE-KMS.</li>
+  <li><strong>Requisito 6 (Acesso administrativo seguro):</strong> AWS Client VPN com autenticação MFA e gerenciamento sem chave SSH via AWS Systems Manager.</li>
+  <li><strong>Requisitos 7 e 9 (Menor Privilégio e Comunicações Mínimas):</strong> Security Groups encadeados por ID de grupo, ausência de regras abertas para a Internet e IAM Roles temporárias.</li>
+  <li><strong>Requisito 8 (Auditoria e monitoramento contínuo):</strong> CloudWatch Logs e Métricas, CloudTrail para trilhas de governança e VPC Flow Logs em todas as ENIs.</li>
+</ul>
+
+<div class="footer-note">
+  Documento técnico de apoio à arquitetura · Gerado para entrega acadêmica · Repositório: <code>arquitetura-aws-segura</code>
+</div>
+
+</body>
+</html>
